@@ -1,0 +1,6 @@
+# Same for dev...
+-r requirements.txt
+
+faker
+pytest
+pytest-dotenv

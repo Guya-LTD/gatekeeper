@@ -1,0 +1,10 @@
+pathlib
+commitizen
+semantic_release
+pre-commit
+python-dotenv
+flask
+Flask-Script
+flask-restplus
+werkzeug~=0.16.1
+git+git://github.com/Guya-LTD/python-logstash.git#egg=python-logstash
