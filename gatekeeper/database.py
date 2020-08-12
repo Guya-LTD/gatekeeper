@@ -40,11 +40,13 @@ Application features:
 This module provides means to perform operations on the database.
 """
 
+import os
+import redis
 from flask import Flask
-
+from dotenv import load_dotenv
 
 # global vars
-
+r = None
 
 def init(app: Flask) -> None:
     """This function initialize the datase ORM/ODM, providing a session
@@ -54,4 +56,15 @@ def init(app: Flask) -> None:
     ----------
         app (flask.app.Flask): The application instance.
     """
-    pass
+    global r
+
+    load_dotenv()
+
+    r = redis.Redis(
+            host = os.environ.get('REDIS_HOST'),
+            port = int(os.environ.get('REDIS_PORT')),
+            db = os.environ.get('REDIS_DB'),
+            decode_responses=True
+        )
+
+    r.ping()

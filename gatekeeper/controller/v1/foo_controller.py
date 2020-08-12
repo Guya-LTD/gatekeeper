@@ -224,7 +224,6 @@ class FoosResource(Resource):
 
         """
 
-
     @namespace.expect(FooDto.request, validate = True)
     def post(self):
         """Save data/datas to database

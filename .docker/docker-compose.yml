@@ -1,0 +1,22 @@
+version: '3.7'
+
+networks:
+  gatekeeper:
+    driver: ${NETWORKS_DRIVER}
+
+services:
+  redis:
+    image: gatekeeper/redis
+    container_name: redis
+    build:
+      context: .
+      dockerfile: ./redis/Dockerfile
+      args:
+        REDIS_VERSION: ${REDIS_VERSION}
+    volumes:
+     - "${SERVICE_DIR}/redis/data:/var/lib/redis"
+     #- "${SERVICE_DIR}/redis.conf:/usr/local/etc/redis/redis.conf"
+    ports:
+      - "6200:${REDIS_PORT}"
+    networks:
+      - gatekeeper
