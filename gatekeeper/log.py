@@ -64,6 +64,6 @@ logger.addHandler(
 
 
 def log_exception(error, extra) -> None:
-    # recommanded for production or eithre the logging servier is running
+    # recommanded for production or either the logging servier is running
     # logger.exception(str(error), extra = __extra__.update(extra))
     pass

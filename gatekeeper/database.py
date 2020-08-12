@@ -67,4 +67,4 @@ def init(app: Flask) -> None:
             decode_responses=True
         )
 
-    r.ping()
+    #r.ping()

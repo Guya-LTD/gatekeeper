@@ -223,6 +223,10 @@ class FoosResource(Resource):
             Json Dictionaries
 
         """
+        from gatekeeper.database import r
+        r.set('foo', 'bar')
+
+        return r.get('foo')
 
     @namespace.expect(FooDto.request, validate = True)
     def post(self):
