@@ -8,4 +8,5 @@ Flask-Script
 flask-restplus
 werkzeug~=0.16.1
 redis
+waitress
 git+git://github.com/Guya-LTD/python-logstash.git#egg=python-logstash

@@ -6,7 +6,7 @@ python:
   - 3.7
 
 services:
-  - mongodb
+  - redis
 
 install:
   #- pip install tox-travis
