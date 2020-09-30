@@ -3,10 +3,6 @@
 ########################################################
 FROM python:3.7-slim AS production
 
-# Install git
-RUN apt-get update
-RUN apt-get -y install git
-
 # workdir
 ENV WORK_DIR /usr/src/app
 WORKDIR ${WORK_DIR}
