@@ -34,6 +34,7 @@ Project
 from flask import jsonify
 import redis
 from werkzeug.exceptions import HTTPException, default_exceptions
+import requests
 
 from .log import log_exception
 
@@ -65,16 +66,16 @@ def register_handler(app):
         """
         if isinstance(error, HTTPException):
             result = {
-                'code': error.code,
-                'description': error.description,
-                'type': 'HTTPException',
-                'message': str(error)}
+                'status_code': error.code,
+                'status': '',
+                'message': error.description,
+                'error': str(error.update({'type': 'HTTPException'}))}
         else:
             result = {
-                'code': 500,
-                'description': 'Internal Server Error',
-                'type': 'Other Exceptions',
-                'message': str(error)}
+                'status_code': 500,
+                'status': 'Internal Server Error',
+                'message': error.description,
+                'error': str(error.update({'type': 'Other Exceptions'}))}
 
         log_exception(error = error, extra = result)
         resp = jsonify(result)
@@ -98,10 +99,10 @@ def register_handler(app):
         """
         # formatting the exception
         result = {
-            'code': 500, 
-            'description': 'Internal Server Error', 
-            'type': 'RedisError',
-            'message': str(error)}
+            'status_code': 500, 
+            'status': 'Internal Server Error', 
+            'message': error.description,
+            'error': str(error.update({'type': 'RedisError'}))}
 
         # logg exception
         log_exception(error = error, extra = result)
@@ -109,6 +110,51 @@ def register_handler(app):
         resp.status_code = 500
         return resp
 
+    # requests exceptions
+    def requests_generic_error_handler(error):
+        custome_error = {
+            'type': 'requests',
+            'message': str(error)
+        }
+        # formatting the exception
+        result = {
+            'status_code': 500,
+            'status': 'Internal Server Error',
+            'message': 'Error caused form calling other RESTful API',
+            'error': custome_error
+        }
+
+        # logg exception
+        log_exception(error = error, extra = result)
+        resp = jsonify(result)
+        resp.status_code = 500
+        return resp
+
+    
+    # request exceptions
+    def requests_request_exception(error):
+        return requests_generic_error_handler(error)
+
+    def requests_connection_error(error):
+        return requests_generic_error_handler(error)
+
+    def requests_http_error(error):
+        return requests_generic_error_handler(error)
+
+    def requests_url_required(error):
+        return requests_generic_error_handler(error)
+
+    def requests_tomany_redirects(error):
+        return requests_generic_error_handler(error)
+
+    def requests_connect_timeout(error):
+        return requests_generic_error_handler(error)
+
+    def requests_readtimeout(error):
+        return requests_generic_error_handler(error)
+
+    def request_timeout(error):
+        return requests_generic_error_handler(error)
         
     # redis exceptions
     def redis_connection_error(error):
@@ -195,3 +241,14 @@ def register_handler(app):
     #app.register_error_handler(redis.LockNotOwnedError,redis_lock_not_owned_error)
     app.register_error_handler(redis.ChildDeadlockedError,redis_child_deadlock_error)
     app.register_error_handler(redis.AuthenticationWrongNumberOfArgsError,redis_authentication_wrong_number_of_args_error)
+
+
+    # requests
+    app.register_error_handler(requests.RequestException, requests_request_exception)
+    app.register_error_handler(requests.ConnectionError, requests_connection_error)
+    app.register_error_handler(requests.HTTPError, requests_http_error)
+    app.register_error_handler(requests.URLRequired, requests_url_required)
+    app.register_error_handler(requests.TooManyRedirects, requests_tomany_redirects)
+    app.register_error_handler(requests.ConnectTimeout, requests_connect_timeout)
+    app.register_error_handler(requests.ReadTimeout, requests_readtimeout)
+    app.register_error_handler(requests.Timeout, request_timeout)
