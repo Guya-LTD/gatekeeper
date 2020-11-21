@@ -9,5 +9,7 @@ flask-restplus
 werkzeug~=0.16.1
 redis
 waitress
+requests
+pyjwt
 #git+git://github.com/Guya-LTD/python-logstash.git#egg=python-logstash
 https://github.com/Guya-LTD/python-logstash/archive/master.zip

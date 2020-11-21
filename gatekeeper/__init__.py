@@ -40,7 +40,7 @@ Application features:
 This module contains the factory function 'create_app' that is
 responsible for initializing the application according
 to a previous configuration.
-"""
+""" 
 
 import os
 from flask import Flask
@@ -51,7 +51,7 @@ from .config import config_by_name
 from .handlers import register_handler
 
 # import all controllers
-from gatekeeper.controller.v1 import foo_controller
+from gatekeeper.controller.v1 import session_controller
 
 # const vars
 __version__ = '0.0.1'
@@ -113,8 +113,9 @@ def init_database(app) -> None:
         app (flask.app.Flask): The application instance Flask that'll be running
     """
 
-    from .database import init
-    init(app)
+    #from .database import init
+    #init(app)
+    pass
 
 
 def init_blueprints(app: Flask) -> None:

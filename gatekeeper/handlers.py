@@ -32,7 +32,7 @@ Project
 
 
 from flask import jsonify
-import redis
+#import redis
 from werkzeug.exceptions import HTTPException, default_exceptions
 import requests
 
@@ -157,59 +157,59 @@ def register_handler(app):
         return requests_generic_error_handler(error)
         
     # redis exceptions
-    def redis_connection_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_connection_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_timeout_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_timeout_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_authentication_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_authentication_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_busy_loading_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_busy_loading_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_invalid_response_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_invalid_response_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_response_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_response_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_data_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_data_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_pub_sub_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_pub_sub_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_watch_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_watch_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_no_script_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_no_script_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_exec_abort_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_exec_abort_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_read_only_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_read_only_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_no_permission_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_no_permission_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_module_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_module_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_lock_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_lock_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_lock_not_owned_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_lock_not_owned_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_child_deadlock_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_child_deadlock_error(error):
+    #    return redis_generic_error_handler(error)
 
-    def redis_authentication_wrong_number_of_args_error(error):
-        return redis_generic_error_handler(error)
+    #def redis_authentication_wrong_number_of_args_error(error):
+    #    return redis_generic_error_handler(error)
 
     ################################################################
     #                                                              #
@@ -223,24 +223,24 @@ def register_handler(app):
 
 
     # redis 
-    app.register_error_handler(redis.ConnectionError, redis_connection_error)
-    app.register_error_handler(redis.TimeoutError,redis_timeout_error)
-    app.register_error_handler(redis.AuthenticationError,redis_authentication_error)
-    app.register_error_handler(redis.BusyLoadingError,redis_busy_loading_error)
-    app.register_error_handler(redis.InvalidResponse,redis_invalid_response_error)
-    app.register_error_handler(redis.ResponseError,redis_response_error)
-    app.register_error_handler(redis.DataError,redis_data_error)
-    app.register_error_handler(redis.PubSubError,redis_pub_sub_error)
-    app.register_error_handler(redis.WatchError,redis_watch_error)
+    #app.register_error_handler(redis.ConnectionError, redis_connection_error)
+    #app.register_error_handler(redis.TimeoutError,redis_timeout_error)
+    #app.register_error_handler(redis.AuthenticationError,redis_authentication_error)
+    #app.register_error_handler(redis.BusyLoadingError,redis_busy_loading_error)
+    #app.register_error_handler(redis.InvalidResponse,redis_invalid_response_error)
+    #app.register_error_handler(redis.ResponseError,redis_response_error)
+    #app.register_error_handler(redis.DataError,redis_data_error)
+    #app.register_error_handler(redis.PubSubError,redis_pub_sub_error)
+    #app.register_error_handler(redis.WatchError,redis_watch_error)
     #app.register_error_handler(redis.NoScriptError,redis_no_script_error)
     #app.register_error_handler(redis.ExecAbortError,redis_exec_abort_error)
-    app.register_error_handler(redis.ReadOnlyError,redis_read_only_error)
+    #app.register_error_handler(redis.ReadOnlyError,redis_read_only_error)
     #app.register_error_handler(redis.NoPermissionError,redis_no_permission_error)
     #app.register_error_handler(redis.ModuleError,redis_module_error)
     #app.register_error_handler(redis.LockError,redis_lock_error)
     #app.register_error_handler(redis.LockNotOwnedError,redis_lock_not_owned_error)
-    app.register_error_handler(redis.ChildDeadlockedError,redis_child_deadlock_error)
-    app.register_error_handler(redis.AuthenticationWrongNumberOfArgsError,redis_authentication_wrong_number_of_args_error)
+    #app.register_error_handler(redis.ChildDeadlockedError,redis_child_deadlock_error)
+    #app.register_error_handler(redis.AuthenticationWrongNumberOfArgsError,redis_authentication_wrong_number_of_args_error)
 
 
     # requests

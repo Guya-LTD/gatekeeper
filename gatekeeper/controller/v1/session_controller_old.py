@@ -114,7 +114,6 @@ Functions:
 
 """
 
-import re
 import os
 import uuid
 import jwt
@@ -123,18 +122,16 @@ import requests
 from flask import request, jsonify, make_response
 from flask_restplus import Resource
 
+from gatekeeper.database import r
 from gatekeeper.exception import ValueEmpty
 from gatekeeper.dto.session_dto import SessionDto
 from gatekeeper.blueprint.v1.session import namespace
 
 # ENDPOINT URLS
-#USER_CREDENTIAL_URL = 'http://' + os.getenv('USER_URL') + '/credentials'
-# MOCKING ENDPOINT URL
-USER_CREDENTIAL_URL = 'http://' + os.getenv('MOCKING_SERVER_URL') + '/api/v1/credentials'
+USER_CREDENTIAL_URL = os.getenv('USER_URL') + '/credentials'
 
 # JWT
 JWT_ALGORITHM = 'HS256'
-# 30 day
 JWT_EXPIRES = datetime.datetime.utcnow() + datetime.timedelta(days = 30)
 
 
@@ -224,9 +221,27 @@ class SessionsResource(Resource):
     post() :
         Save data/datas to database
 
-    """ 
+    """
 
-    @namespace.expect(SessionDto.request, validate = False)
+    def get(self):
+        """Get All/Semi datas from database
+
+        ...
+
+        Query Examples:
+            * Filtering :
+                - name.en=eq:abc&name.am=neq:abc
+
+        Returns
+        -------
+            Json Dictionaries
+
+        """
+        # method not allowed
+        namespace.abort(405)
+        
+
+    @namespace.expect(SessionDto.request, validate = True)
     def post(self):
         """Save data/datas to database
 
@@ -237,35 +252,37 @@ class SessionsResource(Resource):
             Json Dictionaries
 
         """
-        ## This api endpoint creates session
-
+        # uti = User Type Identifier
         # start by validating request fields for extra security
         # step 1 validation: strip payloads for empty string
         if not namespace.payload['identity'].strip() or \
            not namespace.payload['password'].strip():
            raise ValueEmpty({'payload': namespace.payload})
-
+        
         # call user's credential end point
         user_credential_req = requests.get(USER_CREDENTIAL_URL, data = namespace.payload)
         # Check if response is ok
         if user_credential_req.status_code == 200:
             # Convert response to json
             user_credential = user_credential_req.json()
+            # Check if other token exists i.e if user has loged in to another machine
             # Payload to be stored in jwt token
             jwt_payload = {
                 'exp': JWT_EXPIRES,
+                'device': namespace.payload['device']
             }
             # Append the respond data to jwt payload
             jwt_payload.update(user_credential)
             # Encode jwt
             encoded_jwt = jwt.encode(user_credential, os.getenv('SECRET_KEY'), algorithm = JWT_ALGORITHM)
-            print(encoded_jwt)
+            # Save to redis client
+            r.sadd(user_credential['data']['user_id'], encoded_jwt)
             return make_response(jsonify({
                 'status_code': 201,
                 'status': 'Created',
                 'message': 'New Session Created',
                 'data': {
-                    'token': encoded_jwt.decode("utf-8"),
+                    'token': encoded_jwt,
                     'token_type': 'Bearer',
                     'expires': JWT_EXPIRES
                 }
@@ -277,9 +294,7 @@ class SessionsResource(Resource):
                 'message': 'Either User is not found or credential is wrong'
             }), 401)
         else:
-            print(user_credential_req)
-            return make_response(jsonify(user_credential_req.text),user_credential_req.status_code)
-
+            return user_credential_req
 
 
 
@@ -365,7 +380,7 @@ class SessionResource(Resource):
 
     """
 
-    def post(self, id):
+    def get(self, id):
         """Get All/Semi datas from database
 
         ...
@@ -380,27 +395,64 @@ class SessionResource(Resource):
             Json Dictionaries
 
         """
-        if not request.headers.get('Authorization').strip():
-            raise ValueEmpty({'id': request.headers.get('Authorization')})
 
-        ## Decode jwt token
-        encoded_jwt = re.match("^Bearer\s+(.*)", request.headers.get("Authorization"))
-        try:
-            decoded_jwt = jwt.decode(encoded_jwt.group(1), os.getenv('SECRET_KEY'), algorithms = [JWT_ALGORITHM])
+        if not request.args.get('token').strip():
+            raise ValueEmpty({'id': request.args.get('token')})
+
+        credential = r.smembers(request.args.get('token'))
+
+        if not credential:
+            # Session found decode jwt and send back
+            encoded_jwt = credential
+            decoded_jwt = jwt.decode(encoded_jwt, os.getenv('SECRET_KEY'), algorithms = JWT_ALGORITHM)
             return make_response(jsonify({
-                'status_code': 201,
-                'status': 'Created',
-                'message': 'Jwt token decoded',
+                'status_code': 200,
+                'status': 'OK',
+                'message': 'Session Found',
                 'data': decoded_jwt
-            }))
-        except jwt.ExpiredSignatureError as ex:
-            ## Signature has expired
+            }), 200)
+        else:
             return make_response(jsonify({
-                'status_code': 401,
-                'status': 'Unauthorize',
-                'message': 'Invalid token key',
-                'error': {
-                    'message': ex,
-                    'type': 'jwt.ExpiredSignatureError'
-                }
-            }))
+                'status_code': 204,
+                'status': 'No Content',
+                'message': 'No sessions found'
+            }), 204)            
+
+
+    @namespace.expect(SessionDto.request, validate = True)
+    def put(self, id):
+        """Update a data from database
+
+        ...
+
+        Parameters
+        ----------
+        id : String
+            Object Id, i.e 12-byte, 24 char hexadicmal
+
+        Returns
+        -------
+            Json Dictionaries
+
+        """
+
+    def delete(self, id):
+        """Delete a data from database
+
+        ...
+
+        Parameters
+        ----------
+        id : String
+            Object Id, i.e 12-byte, 24 char hexadicmal
+
+        Returns
+        -------
+            Json Dictionaries
+
+        """
+        # Remove one device session using encoded jwt
+        if not namespace.payload['jwt'].strip():
+            raise ValueEmpty('Delete session, empty jwt')
+
+        r.srem(id, namespace.payload['jwt'])
