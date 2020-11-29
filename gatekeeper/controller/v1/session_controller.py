@@ -128,9 +128,9 @@ from gatekeeper.dto.session_dto import SessionDto
 from gatekeeper.blueprint.v1.session import namespace
 
 # ENDPOINT URLS
-#USER_CREDENTIAL_URL = 'http://' + os.getenv('USER_URL') + '/credentials'
+USER_CREDENTIAL_URL = 'http://' + os.getenv('USER_URL') + '/credentials'
 # MOCKING ENDPOINT URL
-USER_CREDENTIAL_URL = 'http://' + os.getenv('MOCKING_SERVER_URL') + '/api/v1/credentials'
+#USER_CREDENTIAL_URL = 'http://' + os.getenv('MOCKING_SERVER_URL') + '/api/v1/credentials'
 
 # JWT
 JWT_ALGORITHM = 'HS256'
@@ -226,7 +226,7 @@ class SessionsResource(Resource):
 
     """ 
 
-    @namespace.expect(SessionDto.request, validate = False)
+    @namespace.expect(SessionDto.request, validate = True)
     def post(self):
         """Save data/datas to database
 
@@ -392,7 +392,7 @@ class SessionResource(Resource):
                 'status': 'Created',
                 'message': 'Jwt token decoded',
                 'data': decoded_jwt
-            }))
+            }), 201)
         except jwt.ExpiredSignatureError as ex:
             ## Signature has expired
             return make_response(jsonify({
@@ -403,4 +403,15 @@ class SessionResource(Resource):
                     'message': ex,
                     'type': 'jwt.ExpiredSignatureError'
                 }
-            }))
+            }), 401)
+        except jwt.DecodeError as ex:
+            ## Decoding Failed
+            return make_response(jsonify({
+                'status_code': 401,
+                'status': 'Unauthorize',
+                'message': 'Failed to decode token. token might be invalid',
+                'error': {
+                    'message': str(ex),
+                    'type': 'jwt.DecodeError'
+                }
+            }), 401)
