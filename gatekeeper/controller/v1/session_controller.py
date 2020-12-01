@@ -259,7 +259,6 @@ class SessionsResource(Resource):
             jwt_payload.update(user_credential)
             # Encode jwt
             encoded_jwt = jwt.encode(user_credential, os.getenv('SECRET_KEY'), algorithm = JWT_ALGORITHM)
-            print(encoded_jwt)
             return make_response(jsonify({
                 'status_code': 201,
                 'status': 'Created',
@@ -388,11 +387,11 @@ class SessionResource(Resource):
         try:
             decoded_jwt = jwt.decode(encoded_jwt.group(1), os.getenv('SECRET_KEY'), algorithms = [JWT_ALGORITHM])
             return make_response(jsonify({
-                'status_code': 201,
+                'status_code': 200,
                 'status': 'Created',
                 'message': 'Jwt token decoded',
                 'data': decoded_jwt
-            }), 201)
+            }), 200)
         except jwt.ExpiredSignatureError as ex:
             ## Signature has expired
             return make_response(jsonify({
