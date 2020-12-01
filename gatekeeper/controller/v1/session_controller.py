@@ -128,7 +128,7 @@ from gatekeeper.dto.session_dto import SessionDto
 from gatekeeper.blueprint.v1.session import namespace
 
 # ENDPOINT URLS
-USER_CREDENTIAL_URL = 'http://' + os.getenv('USER_URL') + '/credentials'
+USER_CREDENTIAL_URL = 'http://' + os.getenv('USER_URL') + '/api/v1/credentials'
 # MOCKING ENDPOINT URL
 #USER_CREDENTIAL_URL = 'http://' + os.getenv('MOCKING_SERVER_URL') + '/api/v1/credentials'
 
@@ -246,7 +246,7 @@ class SessionsResource(Resource):
            raise ValueEmpty({'payload': namespace.payload})
 
         # call user's credential end point
-        user_credential_req = requests.get(USER_CREDENTIAL_URL, data = namespace.payload)
+        user_credential_req = requests.post(USER_CREDENTIAL_URL, json = namespace.payload)
         # Check if response is ok
         if user_credential_req.status_code == 200:
             # Convert response to json
